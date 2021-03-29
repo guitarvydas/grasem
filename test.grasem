@@ -1,0 +1,106 @@
+SemanticsSCL {
+  semantics = ws* semanticsStatement+
+  semanticsStatement = ruleName ws* "[" ws* parameters "]" ws* "=" ws* code? rewrites ws*
+
+  ruleName = letter1 letterRest*
+  
+  parameters = parameter*
+  parameter = treeparameter | flatparameter
+  flatparameter = fpws | fpd
+  fpws = pname ws+
+  fpd = pname delimiter
+  treeparameter = "@" tflatparameter
+  tflatparameter = tfpws | tfpd
+  tfpws = pname ws+
+  tfpd = pname delimiter
+
+  pname = letterRest letterRest*
+  rewrites = rw1 | rw2
+  rw1 = "[[" ws* rwstringWithNewlines "]]" ws*
+  rw2 = rwstring
+
+  letter1 = "_" | "a" .. "z" | "A" .. "Z"
+  letterRest = "0" .. "9" | letter1
+
+  ws = "\n" | " " | "\t" | "," 
+  delimiter = &"]" | &"="
+
+  rwstring = stringchar*
+  stringchar = ~"\n" any
+
+  rwstringWithNewlines = nlstringchar*
+  nlstringchar = ~"]]" ~"}}" any
+  code = "{{" ws* codeString "}}" ws* 
+  codeString = rwstringWithNewlines
+
+}
+
+
+
+
+semantics [@ws @specs] =
+[[
+function addSemantics (sem) {
+  sem.addOperation (
+'_glue',
+{
+${specs}
+_terminal: function () {return this.primitiveValue; }
+});
+}
+]]
+semanticsStatement [name @ws1 _lb @ws2 params _rb @ws3 _eq @ws4 code rewrites @ws5] =
+{{
+scopeAdd("varNameStack", []);
+}}
+[[
+${name} : function (${params}) {
+_ruleEnter ("${name}");
+${scopeGet("varNameStack").join ('')}
+${code}
+var _result = \`${rewrites}\`;
+_ruleExit ("${name}");
+return _result;
+},
+]]
+
+ruleName [c @cs] = ${c}${cs}
+parameters [@p] = ${p}
+parameter [p] = ${p}
+flatparameter[p] =
+  {{ 
+    var stk = scopeGet("varNameStack");
+    var pp = _p._glue ();
+    stk.push (`var ${pp} = _${pp}._glue ();`);
+    scopeModify ("varNameStack", stk);
+  }}
+  [[_${p}]]
+fpws [name @ws] = ${name}
+fpd [name delim] = ${name}
+treeparameter [_at flatp] =
+{{
+    var stk = scopeGet("varNameStack");
+    var fp = _flatp._glue ();
+    stk.push (`var ${fp} = _${fp}._glue ();`);
+    scopeModify ("varNameStack", stk);
+}}
+[[
+_${flatp}
+]]
+tflatparameter [tp] = ${tp}
+tfpws [name @ws] = ${name}
+tfpd [name delim] = ${name}
+pname [c @cs] = ${c}${cs}
+rewrites [rwstr] = ${rwstr}
+rw1 [_lbb @ws1 rwn _rbb @ws2] = ${rwn}
+rw2 [rws] = ${rws}
+letter1 [c] = ${c}
+letterRest [c] = ${c}
+ws [c] = ${c}
+delimiter [c] = [[]]
+rwstring [@sc] = ${sc}
+stringchar [c] = ${c}
+rwstringWithNewlines [@cs] = ${cs}
+nlstringchar [c] = ${c}
+codeString [rwsn] = ${rwsn}
+code [_lb @ws1 s _rb @ws2] = ${s}

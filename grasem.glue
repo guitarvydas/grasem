@@ -1,0 +1,46 @@
+grasem {
+
+grasemProgram = ohmGrammar glueSemantics+
+
+ohmGrammar = grammarName grammarBody
+
+grammarBody = "{" ws* grammarToken+ "}" ws*
+grammarName = name
+
+
+glueSemantics = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
+
+code = "{{" ws* codeChar* "}}" ws*
+
+codeChar = ~"}}" token
+rewriteChar = ~"]]" token
+
+
+semanticsName = name ws*
+semanticsParameters = "[" ws* semanticsParam+ "]" ws*
+semanticsParam = semanticsTreeParam | semanticsFlatParam
+semanticsTreeParam = "@" ws* semanticsFlatParam
+semanticsFlatParam = name ws*
+
+
+name = char1 charRest* ws*
+char1 = "_" | "A" .. "Z" | "a" .. "z"
+charRest = "0" .. "9" | char1
+
+grammarToken = ~"}" token
+token = comment | string | tokenChar
+tokenChar = tokenCharNested | tokenCharSimple
+tokenCharNested = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
+tokenCharSimple = ~"]]" any
+
+comment = "%" notNewline* newline
+
+newline = "\n"
+notNewline = ~"\n" any
+
+string = "\"" notDQuote* "\""
+notDQuote = ~"\"" any
+
+ws = " " | "\n"
+
+}
