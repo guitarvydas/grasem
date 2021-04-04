@@ -64,9 +64,9 @@ return _result;
 },
 ]]
 
-ruleName [c @cs] = ${c}${cs}
-parameters [@p] = ${p}
-parameter [p] = ${p}
+ruleName [c @cs] = [[ ${c}${cs} ]]
+parameters [@p] = [[ ${p} ]]
+parameter [p] = [[ ${p} ]]
 flatparameter[p] =
   {{ 
     var stk = scopeGet("varNameStack");
@@ -75,8 +75,8 @@ flatparameter[p] =
     scopeModify ("varNameStack", stk);
   }}
   [[_${p}]]
-fpws [name @ws] = ${name}
-fpd [name delim] = ${name}
+fpws [name @ws] = [[ ${name} ]]
+fpd [name delim] = [[ ${name} ]]
 treeparameter [_at flatp] =
 {{
     var stk = scopeGet("varNameStack");
@@ -87,20 +87,20 @@ treeparameter [_at flatp] =
 [[
 _${flatp}
 ]]
-tflatparameter [tp] = ${tp}
-tfpws [name @ws] = ${name}
-tfpd [name delim] = ${name}
-pname [c @cs] = ${c}${cs}
-rewrites [rwstr] = ${rwstr}
-rw1 [_lbb @ws1 rwn _rbb @ws2] = ${rwn}
-rw2 [rws] = ${rws}
-letter1 [c] = ${c}
-letterRest [c] = ${c}
-ws [c] = ${c}
+tflatparameter [tp] = [[ ${tp} ]]
+tfpws [name @ws] = [[ ${name} ]]
+tfpd [name delim] = [[ ${name} ]]
+pname [c @cs] = [[ ${c}${cs} ]]
+rewrites [rwstr] = [[ ${rwstr} ]]
+rw1 [_lbb @ws1 rwn _rbb @ws2] = [[ ${rwn} ]]
+rw2 [rws] = [[ ${rws} ]]
+letter1 [c] = [[ ${c} ]]
+letterRest [c] = [[ ${c} ]]
+ws [c] = [[ ${c} ]]
 delimiter [c] = [[]]
-rwstring [@sc] = ${sc}
-stringchar [c] = ${c}
-rwstringWithNewlines [@cs] = ${cs}
-nlstringchar [c] = ${c}
-codeString [rwsn] = ${rwsn}
-code [_lb @ws1 s _rb @ws2] = ${s}
+rwstring [@sc] = [[ ${sc} ]]
+stringchar [c] = [[ ${c} ]]
+rwstringWithNewlines [@cs] = [[ ${cs} ]]
+nlstringchar [c] = [[ ${c} ]]
+codeString [rwsn] = [[ ${rwsn} ]]
+code [_lb @ws1 s _rb @ws2] = [[ ${s} ]]
