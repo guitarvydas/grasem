@@ -1,46 +1,43 @@
-grasem {
 
-grasemProgram = ohmGrammar glueSemantics+
+grasemProgram [@ws ohmGrammar @glueSemantics ] = [[${ws}${ohmGrammar}${glueSemantics}]]
 
-ohmGrammar = grammarName grammarBody
+ohmGrammar [grammarName grammarBody] = [[${grammarName}${grammarBody}]]
 
-grammarBody = "{" ws* grammarToken+ "}" ws*
-grammarName = name
-
-
-glueSemantics = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
-
-code = "{{" ws* codeChar* "}}" ws*
-
-codeChar = ~"}}" token
-rewriteChar = ~"]]" token
+grammarBody [lb @ws @grammarToken rb @ws2] = [[${lb}${grammarToken}${rb}${ws2}]]
+grammarName [ name ] = [[${name}]] 
 
 
-semanticsName = name ws*
-semanticsParameters = "[" ws* semanticsParam+ "]" ws*
-semanticsParam = semanticsTreeParam | semanticsFlatParam
-semanticsTreeParam = "@" ws* semanticsFlatParam
-semanticsFlatParam = name ws*
+glueSemantics [semanticsName semanticsParameters eq @ws @code lbb @rewriteChar rbb @ws2] =
+  [[${semanticsName}${semanticsParameters}${eq}${ws}${code}${lbb}${rewriteChar}${rbb}${ws2}]]
+
+code [lbb @ws @codeChar rbb @ws2] = [[${lbb}${ws}${codeChar}${rbb}${ws2}]]
+
+codeChar [token] = [[${token}]]
+rewriteChar [token] = [[${token}]]
 
 
-name = char1 charRest* ws*
-char1 = "_" | "A" .. "Z" | "a" .. "z"
-charRest = "0" .. "9" | char1
+semanticsName [name @ws] = [[${name}${ws}]]
+semanticsParameters [ lb @ws @semanticsParam rb @ws2] = [[${lb}${ws}${semanticsParam}${rb}${ws2}]]
+semanticsParam [p] = [[${p}]]
+semanticsTreeParam [at @ws semanticsFlatParam] = [[${at}${ws}${semanticsFlatParam}]]
+semanticsFlatParam [name @ws] = [[${name}${ws}]]
 
-grammarToken = ~"}" token
-token = comment | string | tokenChar
-tokenChar = tokenCharNested | tokenCharSimple
-tokenCharNested = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
-tokenCharSimple = ~"]]" any
+name [char1 @charRest @ws] = [[${char1}${charRest}${ws}]]
+char1 [c] = [[${c}]]
+charRest [c] = [[${c}]]
 
-comment = "%" notNewline* newline
+grammarToken [token] = [[${token}]]
+token [x] = [[${x}]]
+tokenChar [c] = [[${c}]]
+tokenCharNested [lb @ws @tokenChar rb @ws2] = [[${lb}${ws}${tokenChar}${rb}${ws2}]]
+tokenCharSimple [c] = [[${c}]]
 
-newline = "\n"
-notNewline = ~"\n" any
+comment [pct @cs nl] = [[${pct}${cs}${nl}]]
 
-string = "\"" notDQuote* "\""
-notDQuote = ~"\"" any
+newline [c] = [[${c}]]
+notNewline [c] = [[${c}]]
 
-ws = " " | "\n"
+string [lq @cs rq] = [[${lq}${cs}${rq}]]
+notDQuote [c] = [[${c}]]
 
-}
+ws [c] = [[${c}]]
