@@ -1,9 +1,9 @@
 
-grasemProgram [@ws ohmGrammar @glueSemantics ] = [[${ws}${ohmGrammar}${glueSemantics}]]
+grasemProgram [@ws ohmGrammar @glueSemantics ] = [[#!/bin/bash\nsplit -p '%%%%%'  - "_" <<'%%EOF'\n${ws}${escapeEscapes (ohmGrammar)}\n%%%%%\n${glueSemantics}\n%%EOF]]
 
 ohmGrammar [grammarName grammarBody] = [[${grammarName}${grammarBody}]]
 
-grammarBody [lb @ws @grammarToken rb @ws2] = [[${lb}${grammarToken}${rb}${ws2}]]
+grammarBody [lb @ws @grammarToken rb @ws2] = [[${lb}${ws}${grammarToken}${rb}${ws2}]]
 grammarName [ name ] = [[${name}]] 
 
 
@@ -38,6 +38,8 @@ newline [c] = [[${c}]]
 notNewline [c] = [[${c}]]
 
 string [lq @cs rq] = [[${lq}${cs}${rq}]]
-notDQuote [c] = [[${c}]]
+stringChar [c] = [[${c}]]
+stringCharEscaped [_bslash c] = [[${_bslash}${c}]]
+stringCharNotEscaped [c] = [[${c}]]
 
 ws [c] = [[${c}]]

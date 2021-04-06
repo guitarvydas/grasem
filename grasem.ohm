@@ -35,12 +35,15 @@ tokenCharSimple = ~"]]" any
 
 comment = "%" notNewline* newline
 
-newline = "\\n"
-notNewline = ~"\\n" any
+newline = "\n"
+notNewline = ~"\n" any
 
-string = "\\"" notDQuote* "\\""
-notDQuote = ~"\\"" any
+string = "\"" stringChar* "\""
+stringChar = stringCharEscaped | stringCharNotEscaped
+stringCharEscaped = "\\" any
+stringCharNotEscaped = ~"\"" any
 
 ws = comment | newline | " " 
 
 }
+
