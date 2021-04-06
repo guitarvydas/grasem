@@ -1,106 +1,94 @@
-SemanticsSCL {
-  semantics = ws* semanticsStatement+
-  semanticsStatement = ruleName ws* "[" ws* parameters "]" ws* "=" ws* code? rewrites ws*
+grasem {
 
-  ruleName = letter1 letterRest*
-  
-  parameters = parameter*
-  parameter = treeparameter | flatparameter
-  flatparameter = fpws | fpd
-  fpws = pname ws+
-  fpd = pname delimiter
-  treeparameter = "@" tflatparameter
-  tflatparameter = tfpws | tfpd
-  tfpws = pname ws+
-  tfpd = pname delimiter
+grasemProgram = ws* ohmGrammar glueSemantics+
 
-  pname = letterRest letterRest*
-  rewrites = rw1 | rw2
-  rw1 = "[[" ws* rwstringWithNewlines "]]" ws*
-  rw2 = rwstring
+ohmGrammar = grammarName grammarBody
 
-  letter1 = "_" | "a" .. "z" | "A" .. "Z"
-  letterRest = "0" .. "9" | letter1
+grammarBody = "{" ws* grammarToken+ "}" ws*
+grammarName = name
 
-  ws = "\n" | " " | "\t" | "," 
-  delimiter = &"]" | &"="
 
-  rwstring = stringchar*
-  stringchar = ~"\n" any
+glueSemantics = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
 
-  rwstringWithNewlines = nlstringchar*
-  nlstringchar = ~"]]" ~"}}" any
-  code = "{{" ws* codeString "}}" ws* 
-  codeString = rwstringWithNewlines
+code = "{{" ws* codeChar* "}}" ws*
+
+codeChar = ~"}}" token
+rewriteChar = ~"]]" token
+
+
+semanticsName = name ws*
+semanticsParameters = "[" ws* semanticsParam+ "]" ws*
+semanticsParam = semanticsTreeParam | semanticsFlatParam
+semanticsTreeParam = "@" ws* semanticsFlatParam
+semanticsFlatParam = name ws*
+
+
+name = char1 charRest* ws*
+char1 = "_" | "A" .. "Z" | "a" .. "z"
+charRest = "0" .. "9" | char1
+
+grammarToken = ~"}" token
+token = comment | string | tokenChar
+tokenChar = tokenCharNested | tokenCharSimple
+tokenCharNested = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
+tokenCharSimple = ~"]]" any
+
+comment = "%" notNewline* newline
+
+newline = "\n"
+notNewline = ~"\n" any
+
+string = "\"" stringChar* "\""
+stringChar = stringCharEscaped | stringCharNotEscaped
+stringCharEscaped = "\\" any
+stringCharNotEscaped = ~"\"" any
+
+ws = comment | newline | " " 
 
 }
 
 
+grasemProgram [@ws ohmGrammar @glueSemantics ] = [[#!/bin/bash\nsplit -p '%%%%%'  - "_" <<'%%EOF'\n${ws}${escapeEscapes (ohmGrammar)}\n%%%%%\n${glueSemantics}\n%%EOF]]
+
+ohmGrammar [grammarName grammarBody] = [[${grammarName}${grammarBody}]]
+
+grammarBody [lb @ws @grammarToken rb @ws2] = [[${lb}${ws}${grammarToken}${rb}${ws2}]]
+grammarName [ name ] = [[${name}]] 
 
 
-semantics [@ws @specs] =
-[[
-function addSemantics (sem) {
-  sem.addOperation (
-'_glue',
-{
-${specs}
-_terminal: function () {return this.primitiveValue; }
-});
-}
-]]
-semanticsStatement [name @ws1 _lb @ws2 params _rb @ws3 _eq @ws4 code rewrites @ws5] =
-{{
-scopeAdd("varNameStack", []);
-}}
-[[
-${name} : function (${params}) {
-_ruleEnter ("${name}");
-${scopeGet("varNameStack").join ('')}
-${code}
-var _result = \`${rewrites}\`;
-_ruleExit ("${name}");
-return _result;
-},
-]]
+glueSemantics [semanticsName semanticsParameters eq @ws @code lbb @rewriteChar rbb @ws2] =
+  [[${semanticsName}${semanticsParameters}${eq}${ws}${code}${lbb}${rewriteChar}${rbb}${ws2}]]
 
-ruleName [c @cs] = [[ ${c}${cs} ]]
-parameters [@p] = [[ ${p} ]]
-parameter [p] = [[ ${p} ]]
-flatparameter[p] =
-  {{ 
-    var stk = scopeGet("varNameStack");
-    var pp = _p._glue ();
-    stk.push (`var ${pp} = _${pp}._glue ();`);
-    scopeModify ("varNameStack", stk);
-  }}
-  [[_${p}]]
-fpws [name @ws] = [[ ${name} ]]
-fpd [name delim] = [[ ${name} ]]
-treeparameter [_at flatp] =
-{{
-    var stk = scopeGet("varNameStack");
-    var fp = _flatp._glue ();
-    stk.push (`var ${fp} = _${fp}._glue ();`);
-    scopeModify ("varNameStack", stk);
-}}
-[[
-_${flatp}
-]]
-tflatparameter [tp] = [[ ${tp} ]]
-tfpws [name @ws] = [[ ${name} ]]
-tfpd [name delim] = [[ ${name} ]]
-pname [c @cs] = [[ ${c}${cs} ]]
-rewrites [rwstr] = [[ ${rwstr} ]]
-rw1 [_lbb @ws1 rwn _rbb @ws2] = [[ ${rwn} ]]
-rw2 [rws] = [[ ${rws} ]]
-letter1 [c] = [[ ${c} ]]
-letterRest [c] = [[ ${c} ]]
-ws [c] = [[ ${c} ]]
-delimiter [c] = [[]]
-rwstring [@sc] = [[ ${sc} ]]
-stringchar [c] = [[ ${c} ]]
-rwstringWithNewlines [@cs] = [[ ${cs} ]]
-nlstringchar [c] = [[ ${c} ]]
-codeString [rwsn] = [[ ${rwsn} ]]
-code [_lb @ws1 s _rb @ws2] = [[ ${s} ]]
+code [lbb @ws @codeChar rbb @ws2] = [[${lbb}${ws}${codeChar}${rbb}${ws2}]]
+
+codeChar [token] = [[${token}]]
+rewriteChar [token] = [[${token}]]
+
+
+semanticsName [name @ws] = [[${name}${ws}]]
+semanticsParameters [ lb @ws @semanticsParam rb @ws2] = [[${lb}${ws}${semanticsParam}${rb}${ws2}]]
+semanticsParam [p] = [[${p}]]
+semanticsTreeParam [at @ws semanticsFlatParam] = [[${at}${ws}${semanticsFlatParam}]]
+semanticsFlatParam [name @ws] = [[${name}${ws}]]
+
+name [char1 @charRest @ws] = [[${char1}${charRest}${ws}]]
+char1 [c] = [[${c}]]
+charRest [c] = [[${c}]]
+
+grammarToken [token] = [[${token}]]
+token [x] = [[${x}]]
+tokenChar [c] = [[${c}]]
+tokenCharNested [lb @ws @tokenChar rb @ws2] = [[${lb}${ws}${tokenChar}${rb}${ws2}]]
+tokenCharSimple [c] = [[${c}]]
+
+comment [pct @cs nl] = [[${pct}${cs}${nl}]]
+
+newline [c] = [[${c}]]
+notNewline [c] = [[${c}]]
+
+string [lq @cs rq] = [[${lq}${cs}${rq}]]
+stringChar [c] = [[${c}]]
+stringCharEscaped [_bslash c] = [[${_bslash}${c}]]
+stringCharNotEscaped [c] = [[${c}]]
+
+ws [c] = [[${c}]]

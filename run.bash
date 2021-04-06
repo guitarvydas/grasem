@@ -1,15 +1,20 @@
 #!/bin/bash
 
-# bootstrapping...
-# run glue to give _grasem-sem.js
-# the final tool (_grasem.js) is an Ohm parser plus JS semantics
+# grammar+semantics all in one file
+# grammar is specified a la Ohm-JS
+# semantics is specified a la Glue
 
-# run the tool on test.grasem to parse a grammar+semantics spec.
-# the tool should produce 1 file - an Ohm parser plus embedded semantics.  The single file
-# is generated from the test.grasem spec.
+# usage: ./run.bash spec.grasem <input-file
 
-node ../glue/gen-glue.js <grasem.glue >_grasem-sem.js
-
-cat parser1.js grasem.ohm parser2.js _grasem-sem.js parser3.js  >_grasem.js
-node _grasem.js <test.grasem >_.grasem
-diff -w _.grasem test.grasem
+spec=$1
+node ../grasem/_grasem.js <${spec} >_.bash
+chmod a+x _.bash
+./_.bash
+mv _aa _.ohm
+mv _ab _.glue
+## now we have _.ohm and _.glue as separate files
+## create JS file for semantics
+node ../glue/gen-glue.js <_.glue >_semantics.js
+## and combine everything into one JS file (with support JS) and run the JS program
+cat ../grasem/parser1.js _.ohm ../grasem/parser2.js _semantics.js ../grasem/parser3.js foreign.js >_program.js
+node _program.js
