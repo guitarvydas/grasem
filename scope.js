@@ -1,6 +1,3 @@
-
-console.log(`'use strict'`);
-console.log(`
 var _scope;
 
 function scopeStack () {
@@ -13,30 +10,31 @@ function scopeStack () {
 	this._top ().push ({key: key, val: val});
     };
     this._lookup = function (key, a) { 
-      return a.find (obj => {return obj && obj.key && (obj.key == key)}); };
+	return a.find (obj => {return obj && obj.key && (obj.key === key)});
+    };
     this.scopeGet = function (key) {
 	var i = this._topIndex ();
-	for (; i > 0 ; i -= 1) {
+	for (; i >= 0 ; i -= 1) {
 	    var obj = this._lookup (key, this._stack [i]);
 	    if (obj) {
 		return obj.val;
 	    };
 	};
-        console.log ('*** scopeGet error ***');
+        console.log (`*** scopeGet error on key ${key} ***`);
 	console.log (this._stack);
 	console.log (key);
 	throw "scopeGet internal error";
     };
     this.scopeModify = function (key, val) {
 	var i = this._topIndex ();
-	for (; i > 0 ; i -= 1) {
+	for (; i >= 0 ; i -= 1) {
 	    var obj = this._lookup (key, this._stack [i]);
 	    if (obj) {
               obj.val = val;
               return val;
 	    };
 	};
-        console.log ('*** scopeModify error ***');
+        console.log (`*** scopeModify error on key ${key} ***`);
 	console.log (this._stack);
 	console.log (key);
 	throw "scopeModify internal error";
@@ -66,6 +64,5 @@ function _ruleEnter (ruleName) {
 function _ruleExit (ruleName) {
     _scope.pop ();
 }
-`);
 
 console.log('_ruleInit ();');
