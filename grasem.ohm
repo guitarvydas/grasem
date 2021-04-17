@@ -45,5 +45,7 @@ stringCharNotEscaped = ~"\"" any
 
 ws = comment | newline | " " 
 
+endGrammar = "}" &newline
+
 }
 

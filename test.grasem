@@ -45,6 +45,8 @@ stringCharNotEscaped = ~"\"" any
 
 ws = comment | newline | " " 
 
+endGrammar = "}" &newline
+
 }
 
 
@@ -92,3 +94,5 @@ stringCharEscaped [_bslash c] = [[${_bslash}${c}]]
 stringCharNotEscaped [c] = [[${c}]]
 
 ws [c] = [[${c}]]
+
+endGrammar [c nl] = [[${c}${nl}]]
