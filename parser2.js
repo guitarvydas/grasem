@@ -7,10 +7,12 @@ function ohm_parse (grammar, text) {
     var parser = ohm.grammar (grammar);
     var cst = parser.match (text);
     if (cst.succeeded ()) {
-	return { parser: parser, cst: cst };
+	return { succeeded: true, message: "OK", parser: parser, cst: cst };
     } else {
 	//console.log (parser.trace (text).toString ());
-	throw "glue: Ohm matching failed";
+	//throw "glue: Ohm matching failed";
+        
+        return { succeeded: false, message: cst.message, parser: parser, cst: cst };
     }
 }
 
