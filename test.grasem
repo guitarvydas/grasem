@@ -1,51 +1,51 @@
 grasem {
 
-grasemProgram = ws* ohmGrammar glueSemantics+
+grasemProgram (grasem: program) = ws* ohmGrammar glueSemantics+
 
-ohmGrammar = grammarName grammarBody
+ohmGrammar (grasem: grammar) = grammarName grammarBody
 
-grammarBody = "{" ws* grammarToken+ "}" ws*
-grammarName = name
-
-
-glueSemantics = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
-
-code = "{{" ws* codeChar* "}}" ws*
-
-codeChar = ~"}}" token
-rewriteChar = ~"]]" token
+grammarBody (grasem: body) = "{" ws* grammarToken+ "}" ws*
+grammarName (grasem: name) = name
 
 
-semanticsName = name ws*
-semanticsParameters = "[" ws* semanticsParam+ "]" ws*
-semanticsParam = semanticsTreeParam | semanticsFlatParam
-semanticsTreeParam = "@" ws* semanticsFlatParam
-semanticsFlatParam = name ws*
+glueSemantics (grasem: glue) = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
+
+code (grasem: code) = "{{" ws* codeChar* "}}" ws*
+
+codeChar (grasem: code char) = ~"}}" token
+rewriteChar (grasem: rewrite char) = ~"]]" token
 
 
-name = char1 charRest* ws*
-char1 = "_" | "A" .. "Z" | "a" .. "z"
-charRest = "0" .. "9" | char1
+semanticsName (grasem: semantics name) = name ws*
+semanticsParameters (grasem: semantics parameters) = "[" ws* semanticsParam+ "]" ws*
+semanticsParam (grasem: semantics param) = semanticsTreeParam | semanticsFlatParam
+semanticsTreeParam (grasem: semantics tree parameter) = "@" ws* semanticsFlatParam
+semanticsFlatParam (grasem: semantics flat parameter) = name ws*
 
-grammarToken = ~"}" token
-token = comment | string | tokenChar
-tokenChar = tokenCharNested | tokenCharSimple
-tokenCharNested = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
-tokenCharSimple = ~"]]" any
 
-comment = "%" notNewline* newline
+name (grasem: name) = char1 charRest* ws*
+char1 (grasem: char 1) = "_" | "A" .. "Z" | "a" .. "z"
+charRest (grasem: char rest) = "0" .. "9" | char1
 
-newline = "\n"
-notNewline = ~"\n" any
+grammarToken (grasem: grammar token) = ~"}" token
+token (grasem: token) = comment | string | tokenChar
+tokenChar (grasem: token char) = tokenCharNested | tokenCharSimple
+tokenCharNested (grasem: token char nested) = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
+tokenCharSimple (grasem: token char simple) = ~"]]" any
 
-string = "\"" stringChar* "\""
-stringChar = stringCharEscaped | stringCharNotEscaped
-stringCharEscaped = "\\" any
-stringCharNotEscaped = ~"\"" any
+comment (grasem: comment) = "%" notNewline* newline
 
-ws = comment | newline | " " 
+newline (grasem: newline) = "\n"
+notNewline (grasem: not newline) = ~"\n" any
 
-endGrammar = "}" &newline
+string (grasem: string) = "\"" stringChar* "\""
+stringChar (grasem: string char) = stringCharEscaped | stringCharNotEscaped
+stringCharEscaped (grasem: string char escaped) = "\\" any
+stringCharNotEscaped (grasem: string char not escaped) = ~"\"" any
+
+ws (grasem: ws) = comment | newline | " " 
+
+endGrammar (grasem: end grammar) = "}" &newline
 
 }
 
