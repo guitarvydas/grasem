@@ -17,5 +17,5 @@ mv _ab _.glue
 ## create JS file for semantics
 node ../glue/gen-glue.js <_.glue >_semantics.js
 ## and combine everything into one JS file (with support JS) and run the JS program
-cat ../grasem/parser1.js _.ohm ../grasem/parser2.js _semantics.js ../grasem/parser3.js ../grasem/scope.js foreign.js >_program.js
-node _program.js
+cat ../grasem/parser1.js _.ohm ../grasem/parser2.js _semantics.js ../grasem/parser3.js 
+
