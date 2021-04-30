@@ -22,7 +22,7 @@ function scopeStack () {
 		return obj.val;
 	    };
 	};
-        console.log ('*** scopeGet error ***');
+        console.log ('*** scopeGet error ' + key + ' ***);
 	console.log (this._stack);
 	console.log (key);
 	throw "scopeGet internal error";
@@ -36,7 +36,7 @@ function scopeStack () {
               return val;
 	    };
 	};
-        console.log ('*** scopeModify error ***');
+        console.log ('*** scopeModify error ' + key + ' ***');
 	console.log (this._stack);
 	console.log (key);
 	throw "scopeModify internal error";
