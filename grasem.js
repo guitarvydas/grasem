@@ -35,7 +35,7 @@ charRest = "0" .. "9" | char1
 grammarToken = ~"}" token
 token = comment | string | tokenChar
 tokenChar = tokenCharNested | tokenCharSimple
-tokenCharNested* "}" ws*
+tokenCharNested = "}" ws*
 tokenCharSimple = ~"]]" any
 
 comment = "%" notNewline* newline
