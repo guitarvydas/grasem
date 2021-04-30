@@ -5,52 +5,52 @@ const grammar =
       `
 grasem {
 
-grasemProgram (grasem: program) = ws* ohmGrammar glueSemantics+
+grasemProgram = ws* ohmGrammar glueSemantics+
 
-ohmGrammar (grasem: grammar) = grammarName grammarBody
+ohmGrammar = grammarName grammarBody
 
-grammarBody (grasem: body) = "{" ws* grammarToken+ "}" ws*
-grammarName (grasem: name) = name
-
-
-glueSemantics (grasem: glue) = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
-
-code (grasem: code) = "{{" ws* codeChar* "}}" ws*
-
-codeChar (grasem: code char) = ~"}}" token
-rewriteChar (grasem: rewrite char) = ~"]]" token
+grammarBody = "{" ws* grammarToken+ "}" ws*
+grammarName = name
 
 
-semanticsName (grasem: semantics name) = name ws*
-semanticsParameters (grasem: semantics parameters) = "[" ws* semanticsParam+ "]" ws*
-semanticsParam (grasem: semantics param) = semanticsTreeParam | semanticsFlatParam
-semanticsTreeParam (grasem: semantics tree parameter) = "@" ws* semanticsFlatParam
-semanticsFlatParam (grasem: semantics flat parameter) = name ws*
+glueSemantics = semanticsName semanticsParameters "=" ws* code? "[[" rewriteChar* "]]" ws*
+
+code = "{{" ws* codeChar* "}}" ws*
+
+codeChar = ~"}}" token
+rewriteChar = ~"]]" token
 
 
-name (grasem: name) = char1 charRest* ws*
-char1 (grasem: char 1) = "_" | "A" .. "Z" | "a" .. "z"
-charRest (grasem: char rest) = "0" .. "9" | char1
+semanticsName = name ws*
+semanticsParameters = "[" ws* semanticsParam+ "]" ws*
+semanticsParam = semanticsTreeParam | semanticsFlatParam
+semanticsTreeParam = "@" ws* semanticsFlatParam
+semanticsFlatParam = name ws*
 
-grammarToken (grasem: grammar token) = ~"}" token
-token (grasem: token) = comment | string | tokenChar
-tokenChar (grasem: token char) = tokenCharNested | tokenCharSimple
-tokenCharNested (grasem: token char nested) = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
-tokenCharSimple (grasem: token char simple) = ~"]]" any
 
-comment (grasem: comment) = "%" notNewline* newline
+name = char1 charRest* ws*
+char1 = "_" | "A" .. "Z" | "a" .. "z"
+charRest = "0" .. "9" | char1
 
-newline (grasem: newline) = "\\n"
-notNewline (grasem: not newline) = ~"\\n" any
+grammarToken = ~"}" token
+token = comment | string | tokenChar
+tokenChar = tokenCharNested | tokenCharSimple
+tokenCharNested* "}" ws*
+tokenCharSimple = ~"]]" any
 
-string (grasem: string) = "\\"" stringChar* "\\""
-stringChar (grasem: string char) = stringCharEscaped | stringCharNotEscaped
-stringCharEscaped (grasem: string char escaped) = "\\\\" any
-stringCharNotEscaped (grasem: string char not escaped) = ~"\\"" any
+comment = "%" notNewline* newline
 
-ws (grasem: ws) = comment | newline | " " 
+newline = "\\n"
+notNewline = ~"\\n" any
 
-endGrammar (grasem: end grammar) = "}" &newline
+string = "\\"" stringChar* "\\""
+stringChar = stringCharEscaped | stringCharNotEscaped
+stringCharEscaped = "\\\\" any
+stringCharNotEscaped = ~"\\"" any
+
+ws = comment | newline | " " 
+
+endGrammar = "}" &newline
 
 }
 
