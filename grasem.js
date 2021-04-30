@@ -35,7 +35,7 @@ charRest = "0" .. "9" | char1
 grammarToken = ~"}" token
 token = comment | string | tokenChar
 tokenChar = tokenCharNested | tokenCharSimple
-tokenCharNested = "}" ws*
+tokenCharNested = "{" ws* (~"{" ~"}" ~"}}" ~"]]" tokenChar)* "}" ws*
 tokenCharSimple = ~"]]" any
 
 comment = "%" notNewline* newline
@@ -325,7 +325,10 @@ var _result = `${c}`;
 _ruleExit ("tokenChar");
 return _result;
 },
-tokenCharNested : function (_lb,_ws,_tokenChar,_rb,_ws2,) {
+tokenCharNested : function (_lb,_ws
+,_tokenChar
+,_rb,_ws2
+,) {
 _ruleEnter ("tokenCharNested");
 
 var lb = _lb._glue ();var ws = _ws._glue ().join ('');var tokenChar = _tokenChar._glue ().join ('');var rb = _rb._glue ();var ws2 = _ws2._glue ().join ('');
