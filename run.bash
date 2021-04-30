@@ -8,7 +8,7 @@ set -e
 # usage: ./run.bash spec.grasem <input-file
 
 spec=$1
-node ~/quicklisp/local-projects/grasem/grasem.js <${spec} >_.bash
+node ~/quicklisp/local-projects/grasem/_grasem.js <${spec} >_.bash
 chmod a+x _.bash
 ./_.bash
 mv _aa _.ohm
