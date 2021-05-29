@@ -1,4 +1,10 @@
 #!/bin/bash
+trap 'catch' ERR
+
+catch () {
+    echo '*** fatal error in grasem/run.bash'
+    exit 1
+}
 set -e
 
 # grammar+semantics all in one file
