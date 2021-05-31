@@ -48,7 +48,7 @@ stringChar = stringCharEscaped | stringCharNotEscaped
 stringCharEscaped = "\\\\" any
 stringCharNotEscaped = ~"\\"" any
 
-ws = comment | newline | " " 
+ws = comment | newline | " " | "\t"
 
 endGrammar = "}" &newline
 
